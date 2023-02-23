@@ -1,9 +1,10 @@
 import React, { PureComponent } from 'react';
-import { StyleSheet, View } from 'react-native';
+import { StyleSheet, Text, View } from 'react-native';
+
+import Picker from './picker';
 // import { ColorPropType, ViewPropTypes as RNViewPropTypes } from 'deprecated-react-native-prop-types'
 import PropTypes from 'prop-types';
 import moment from 'moment';
-import Picker from './picker';
 
 // const ViewPropTypes = RNViewPropTypes || View.propTypes;
 const firstTimeOnChange = {
@@ -244,7 +245,7 @@ export default class DatePicker extends PureComponent {
     }
 
     for (let i = 0; i <= 59; i += 1) {
-      minutes.push(i);
+      minutes.push({value: i, label: `${i}`.padStart(2, '0')});
     }
 
     return [
@@ -265,6 +266,9 @@ export default class DatePicker extends PureComponent {
           pickerData={minutes}
           onValueChange={this.onMinuteChange}
         />
+      </View>,
+      <View key='separator' style={[styles.picker, {position: 'absolute', top: '50%', left: '50%', marginTop: -22, width: 36, marginLeft: -18}]}>
+        <Text style={{fontSize: 24, lineHeight: 36, textAlign: 'center'}}>:</Text>
       </View>,
     ];
   }
