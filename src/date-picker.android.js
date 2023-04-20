@@ -1,10 +1,11 @@
-import React, { PureComponent } from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import React, {PureComponent} from 'react';
+import {StyleSheet, Text, View} from 'react-native';
 
 import Picker from './picker';
 // import { ColorPropType, ViewPropTypes as RNViewPropTypes } from 'deprecated-react-native-prop-types'
 import PropTypes from 'prop-types';
 import moment from 'moment';
+import {padStart} from 'lodash';
 
 // const ViewPropTypes = RNViewPropTypes || View.propTypes;
 const firstTimeOnChange = {
@@ -13,7 +14,7 @@ const firstTimeOnChange = {
   date: true,
   hour: true,
   minute: true,
-}
+};
 
 const styles = StyleSheet.create({
   picker: {
@@ -24,7 +25,7 @@ const styles = StyleSheet.create({
   },
 });
 
-const stylesFromProps = props => ({
+const stylesFromProps = (props) => ({
   textColor: props.textColor,
   textSize: props.textSize,
   style: props.style,
@@ -52,7 +53,7 @@ export default class DatePicker extends PureComponent {
     labelUnit: {
       year: '',
       month: moment.months(),
-      date: ''
+      date: '',
     },
     order: 'M-D-Y',
     mode: 'date',
@@ -67,9 +68,9 @@ export default class DatePicker extends PureComponent {
   constructor(props) {
     super(props);
 
-    const { date, minimumDate, maximumDate, labelUnit } = props;
+    const {date, minimumDate, maximumDate, labelUnit} = props;
 
-    this.state = { date, monthRange: [], yearRange: [] };
+    this.state = {date, monthRange: [], yearRange: []};
 
     this.newValue = {};
 
@@ -84,41 +85,41 @@ export default class DatePicker extends PureComponent {
     const maxYear = maximumDate.getFullYear();
 
     for (let i = 1; i <= 12; i += 1) {
-      this.state.monthRange.push({ value: i, label: `${labelUnit.month[i - 1]}` });
+      this.state.monthRange.push({value: i, label: `${labelUnit.month[i - 1]}`});
     }
 
-    this.state.yearRange.push({ value: minYear, label: `${minYear}${labelUnit.year}` });
+    this.state.yearRange.push({value: minYear, label: `${minYear}${labelUnit.year}`});
 
     for (let i = minYear + 1; i <= maxYear; i += 1) {
-      this.state.yearRange.push({ value: i, label: `${i}${labelUnit.year}` });
+      this.state.yearRange.push({value: i, label: `${i}${labelUnit.year}`});
     }
   }
 
   static getDerivedStateFromProps(nextProps, prevState) {
     if (prevState.date !== nextProps.date) {
-
-      if(typeof this === 'object' && typeof this.parseDate === 'function'){
+      if (typeof this === 'object' && typeof this.parseDate === 'function') {
         this.parseDate(nextProps.date);
       }
 
-      return { date: nextProps.date }
-    }
-    else return null;
+      return {date: nextProps.date};
+    } else return null;
   }
 
   parseDate = (date) => {
     const mdate = moment(date);
 
-    ['year', 'month', 'date', 'hour', 'minute'].forEach((s) => { this.newValue[s] = mdate.get(s); });
-  }
+    ['year', 'month', 'date', 'hour', 'minute'].forEach((s) => {
+      this.newValue[s] = mdate.get(s);
+    });
+  };
 
   onYearChange = (year) => {
     const oldYear = this.newValue.year;
 
     this.newValue.year = year;
     this.checkDate(oldYear, this.newValue.month);
-    if(firstTimeOnChange.year) {
-      firstTimeOnChange.year = false
+    if (firstTimeOnChange.year) {
+      firstTimeOnChange.year = false;
     }
     this.props.onDateChange(this.getValue());
   };
@@ -128,8 +129,8 @@ export default class DatePicker extends PureComponent {
 
     this.newValue.month = month - 1;
     this.checkDate(this.newValue.year, oldMonth);
-    if(firstTimeOnChange.month) {
-      firstTimeOnChange.month = false
+    if (firstTimeOnChange.month) {
+      firstTimeOnChange.month = false;
     }
     this.props.onDateChange(this.getValue());
   };
@@ -137,24 +138,24 @@ export default class DatePicker extends PureComponent {
   onDateChange = (date) => {
     this.newValue.date = date;
     this.checkDate(this.newValue.year, this.newValue.month);
-    if(firstTimeOnChange.date) {
-      firstTimeOnChange.date = false
+    if (firstTimeOnChange.date) {
+      firstTimeOnChange.date = false;
     }
     this.props.onDateChange(this.getValue());
   };
 
   onHourChange = (hour) => {
     this.newValue.hour = hour;
-    if(firstTimeOnChange.hour) {
-      firstTimeOnChange.hour = false
+    if (firstTimeOnChange.hour) {
+      firstTimeOnChange.hour = false;
     }
     this.props.onDateChange(this.getValue());
   };
 
   onMinuteChange = (minute) => {
     this.newValue.minute = minute;
-    if(firstTimeOnChange.minute) {
-      firstTimeOnChange.minute = false
+    if (firstTimeOnChange.minute) {
+      firstTimeOnChange.minute = false;
     }
     this.props.onDateChange(this.getValue());
   };
@@ -163,7 +164,7 @@ export default class DatePicker extends PureComponent {
     const days = [];
 
     for (let i = 1; i <= dayNum; i += 1) {
-      days.push({ value: i, label: `${i}${this.props.labelUnit.date}` });
+      days.push({value: i, label: `${i}${this.props.labelUnit.date}`});
     }
 
     return days;
@@ -183,7 +184,7 @@ export default class DatePicker extends PureComponent {
   get datePicker() {
     const propsStyles = stylesFromProps(this.props);
 
-    const { order } = this.props;
+    const {order} = this.props;
 
     if (!order.includes('D') && !order.includes('M') && !order.includes('Y')) {
       throw new Error(`WheelDatePicker: you are using order prop wrong, default value is 'D-M-Y'`);
@@ -191,48 +192,58 @@ export default class DatePicker extends PureComponent {
 
     return this.props.order.split('-').map((key) => {
       switch (key) {
-        case 'D': return (
-          <View key='date' style={styles.picker}>
-            <Picker
-              {...propsStyles}
-              {...this.props}
-              style={{...this.props.style, width: '100%'}}
-              ref={(date) => { this.dateComponent = date; }}
-              selectedValue={this.state.date.getDate()}
-              pickerData={this.state.dayRange}
-              onValueChange={this.onDateChange}
-            />
-          </View>
-        );
-        case 'M': return (
-          <View key='month' style={styles.picker}>
-            <Picker
-              {...propsStyles}
-              {...this.props}
-              style={{...this.props.style, width: '100%'}}
-              ref={(month) => { this.monthComponent = month; }}
-              selectedValue={this.state.date.getMonth() + 1}
-              pickerData={this.state.monthRange}
-              onValueChange={this.onMonthChange}
-            />
-          </View>
-        );
-        case 'Y': return (
-          <View key='year' style={styles.picker}>
-            <Picker
-              {...propsStyles}
-              {...this.props}
-              style={{...this.props.style, width: '100%'}}
-              ref={(year) => { this.yearComponent = year; }}
-              selectedValue={this.state.date.getFullYear()}
-              pickerData={this.state.yearRange}
-              onValueChange={this.onYearChange}
-            />
-          </View>
-        );
-        default: return null;
+        case 'D':
+          return (
+            <View key='date' style={styles.picker}>
+              <Picker
+                {...propsStyles}
+                {...this.props}
+                style={{...this.props.style, width: '100%'}}
+                ref={(date) => {
+                  this.dateComponent = date;
+                }}
+                selectedValue={this.state.date.getDate()}
+                pickerData={this.state.dayRange}
+                onValueChange={this.onDateChange}
+              />
+            </View>
+          );
+        case 'M':
+          return (
+            <View key='month' style={styles.picker}>
+              <Picker
+                {...propsStyles}
+                {...this.props}
+                style={{...this.props.style, width: '100%'}}
+                ref={(month) => {
+                  this.monthComponent = month;
+                }}
+                selectedValue={this.state.date.getMonth() + 1}
+                pickerData={this.state.monthRange}
+                onValueChange={this.onMonthChange}
+              />
+            </View>
+          );
+        case 'Y':
+          return (
+            <View key='year' style={styles.picker}>
+              <Picker
+                {...propsStyles}
+                {...this.props}
+                style={{...this.props.style, width: '100%'}}
+                ref={(year) => {
+                  this.yearComponent = year;
+                }}
+                selectedValue={this.state.date.getFullYear()}
+                pickerData={this.state.yearRange}
+                onValueChange={this.onYearChange}
+              />
+            </View>
+          );
+        default:
+          return null;
       }
-    })
+    });
   }
 
   get timePicker() {
@@ -241,17 +252,19 @@ export default class DatePicker extends PureComponent {
     const [hours, minutes] = [[], []];
 
     for (let i = 1; i <= 24; i += 1) {
-      hours.push(i);
+      hours.push({label: `${i}`, value: i});
     }
 
     for (let i = 0; i <= 59; i += 1) {
-      minutes.push({value: i, label: `${i}`.padStart(2, '0')});
+      minutes.push({label: padStart(i, 2, '0'), value: i});
     }
 
     return [
       <View key='hour' style={styles.picker}>
         <Picker
-          ref={(hour) => { this.hourComponent = hour; }}
+          ref={(hour) => {
+            this.hourComponent = hour;
+          }}
           {...propsStyles}
           selectedValue={this.state.date.getHours()}
           pickerData={hours}
@@ -260,16 +273,32 @@ export default class DatePicker extends PureComponent {
       </View>,
       <View key='minute' style={styles.picker}>
         <Picker
-          ref={(minute) => { this.minuteComponent = minute; }}
+          ref={(minute) => {
+            this.minuteComponent = minute;
+          }}
           {...propsStyles}
           selectedValue={this.state.date.getMinutes()}
           pickerData={minutes}
           onValueChange={this.onMinuteChange}
         />
       </View>,
-      <View key='separator' style={[styles.picker, {position: 'absolute', top: '50%', left: '50%', marginTop: -22, width: 36, marginLeft: -18}]}>
-        <Text style={{fontSize: 24, lineHeight: 36, textAlign: 'center'}}>:</Text>
-      </View>,
+      <Text
+        style={{
+          position: 'absolute',
+          top: '50%',
+          left: '50%',
+          fontSize: 24,
+          fontWeight: '600',
+          width: 24,
+          height: 24,
+          lineHeight: 24,
+          marginLeft: -12,
+          marginTop: -12,
+          textAlign: 'center',
+          color: this.props.textColor,
+        }}>
+        :
+      </Text>,
     ];
   }
 
@@ -290,14 +319,14 @@ export default class DatePicker extends PureComponent {
 
       if (currentDay > dayNum) {
         this.newValue.date = dayNum;
-        this.dateComponent.setState({ selectedValue: dayNum });
+        this.dateComponent.setState({selectedValue: dayNum});
       }
 
-      this.setState({ dayRange });
+      this.setState({dayRange});
     }
 
     const unit = this.props.mode === 'date' ? 'day' : undefined;
-    const current = Object.assign({}, this.newValue, { date: this.newValue.date });
+    const current = Object.assign({}, this.newValue, {date: this.newValue.date});
     let currentTime = moment(current);
     const min = moment(this.props.minimumDate);
     const max = moment(this.props.maximumDate);
@@ -311,19 +340,19 @@ export default class DatePicker extends PureComponent {
 
     if (isCurrentTimeChanged) {
       if (this.monthComponent) {
-        this.monthComponent.setState({ selectedValue: currentTime.get('month') + 1 });
+        this.monthComponent.setState({selectedValue: currentTime.get('month') + 1});
       }
 
       ['year', 'date', 'hour', 'minute'].forEach((segment) => {
         const ref = this[`${segment}Component`];
 
-        return ref && ref.setState({ selectedValue: currentTime.get(segment) });
+        return ref && ref.setState({selectedValue: currentTime.get(segment)});
       });
     }
   }
 
   getValue() {
-    const { year, month, date, hour, minute } = this.newValue;
+    const {year, month, date, hour, minute} = this.newValue;
     const nextDate = new Date(year, month, date, hour, minute);
 
     if (nextDate < this.props.minimumDate) {
