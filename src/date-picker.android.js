@@ -251,8 +251,8 @@ export default class DatePicker extends PureComponent {
 
     const [hours, minutes] = [[], []];
 
-    for (let i = 1; i <= 24; i += 1) {
-      hours.push({label: `${i}`, value: i});
+    for (let i = 0; i <= 23; i += 1) {
+      hours.push({label: padStart(i, 2, '0'), value: i});
     }
 
     for (let i = 0; i <= 59; i += 1) {
